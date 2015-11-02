@@ -2,6 +2,7 @@
 
 namespace Restful\SampleBundle\Tests\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DefaultControllerTest extends WebTestCase
@@ -13,16 +14,17 @@ class DefaultControllerTest extends WebTestCase
         $apiResponse    = $client->request('GET', '/hello/Fabien');
         $jsonExpected   = json_encode(array(
             'name'      => 'Fabian',
-            '_self'     => $apiResponse->getUri()
+            '_self'     => $client->getRequest()->getUri()
         ));
+        
         $this->assertEquals(
             Response::HTTP_CREATED,
-            $apiResponse->getResponse()->getStatusCode(),
+            $client->getResponse()->getStatusCode(),
             'Expects to recieved a 200 ok status code'
         );
         $this->assertEquals(
             $jsonExpected,
-            $apiResponse->getResponse()->getContent(),
+            $client->getResponse()->getContent(),
             'Expects the exact Json encoded array content'
         );
     }
@@ -31,15 +33,15 @@ class DefaultControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $apiResponse = $client->request('GET', '/hello/');
+        $apiResponse    = $client->request('GET', '/hello/');
 
         $this->assertEquals(
             Response::HTTP_NOT_FOUND,
-            $apiResponse->getResponse()->getStatusCode(),
+            $client->getResponse()->getStatusCode(),
             'Expects 404 not found status code'
         );
         $this->assertEmpty(
-            $apiResponse->getResponse()->getContent(),
+            $client->getResponse()->getContent(),
             'Expects empty content'
         );
     }
@@ -52,8 +54,11 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertEquals(
             Response::HTTP_NOT_IMPLEMENTED,
-            $apiResponse->getResponse()->getStatusCode(),
+            $client->getResponse()->getStatusCode(),
             'Expects a 501 method not implemented status code because delete is not implemented');
-        $this->assertEmpty($apiResponse->getResponse()->getContent());
+        $this->assertEmpty(
+            $client->getResponse()->getContent(),
+            'Expects empty content'
+        );
     }
 }
